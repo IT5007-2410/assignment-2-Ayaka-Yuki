@@ -19,7 +19,7 @@ function TravellerRow(props) {
       <td>{props.traveller.id}</td>
       <td>{props.traveller.name}</td>
       <td>{props.traveller.phone}</td>
-      <td>{props.traveller.bookingTime.toString()}</td> {/* Format as needed */}
+      <td>{props.traveller.bookingTime.toString()}</td>
     </tr>
   );
 }
@@ -32,7 +32,7 @@ function Display(props) {
     <table className="bordered-table">
       <thead>
         <tr>
-	  {/*Q3. Below table is just an example. Add more columns based on the traveller attributes you choose.*/}
+	        {/*Q3. Below table is just an example. Add more columns based on the traveller attributes you choose.*/}
           <th>ID</th>
           <th>Name</th>
           <th>Phone</th>
@@ -41,9 +41,7 @@ function Display(props) {
       </thead>
       <tbody>
         {/*Q3. write code to call the JS variable defined at the top of this function to render table rows.*/
-        props.travellers.map(traveller => (
-          <TravellerRow key={traveller.id} traveller={traveller} />
-        ))
+        props.travellers.map(traveller => (<TravellerRow key={traveller.id} traveller={traveller} />))
         }
       </tbody>
     </table>
@@ -59,6 +57,14 @@ class Add extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     /*Q4. Fetch the passenger details from the add form and call bookTraveller()*/
+    const form = document.forms.addTraveller;
+    const maxId = Math.max(...this.props.travellers.map(t => t.id), 0);
+    this.props.bookTraveller({ 
+      id: maxId + 1,
+      name: form.travellername.value, 
+      phone: form.travellerphone.value,
+      bookingTime: new Date()
+    });
   }
 
   render() {
@@ -66,6 +72,7 @@ class Add extends React.Component {
       <form name="addTraveller" onSubmit={this.handleSubmit}>
 	    {/*Q4. Placeholder to enter passenger details. Below code is just an example.*/}
         <input type="text" name="travellername" placeholder="Name" />
+        <input type="text" name="travellerphone" placeholder="Phone" />
         <button>Add</button>
       </form>
     );
@@ -81,13 +88,15 @@ class Delete extends React.Component {
   handleSubmit(e) {
     e.preventDefault();
     /*Q5. Fetch the passenger details from the deletion form and call deleteTraveller()*/
+    const form = document.forms.deleteTraveller;
+    this.props.deleteTraveller(form.travellername.value);
   }
 
   render() {
     return (
       <form name="deleteTraveller" onSubmit={this.handleSubmit}>
 	    {/*Q5. Placeholder form to enter information on which passenger's ticket needs to be deleted. Below code is just an example.*/}
-	<input type="text" name="travellername" placeholder="Name" />
+	      <input type="text" name="travellername" placeholder="Name" />
         <button>Delete</button>
       </form>
     );
@@ -134,16 +143,26 @@ class TicketToRide extends React.Component {
 	    /*Q4. Write code to add a passenger to the traveller state variable.*/
       this.setState((prevState) => ({
         travellers: [...prevState.travellers, passenger]
-      }));
-      console.log('Traveller added', this.state.travellers);
+      }), () => {
+        // This callback runs after the state has been updated
+        console.log('Traveller added', this.state.travellers);
+      }
+    );
   }
 
   deleteTraveller(passenger) {
 	  /*Q5. Write code to delete a passenger from the traveller state variable.*/
+    if (!this.state.travellers.some(traveller => traveller.name === passenger)) {
+      alert('Traveller not found in the database.');
+      return;
+    }
     this.setState((prevState) => ({
-      travellers: prevState.travellers.filter(traveller => traveller.name !== passengerName)
-    }));
-    console.log('Traveller deleted', this.state.travellers);
+      // this will delete all travellers with the same name as the passenger
+      travellers: prevState.travellers.filter(traveller => traveller.name !== passenger)
+    }), () => {
+      // This callback runs after the state has been updated
+      console.log('Traveller deleted', this.state.travellers);
+    });
   }
   render() {
     return (
@@ -164,9 +183,9 @@ class TicketToRide extends React.Component {
     this.state.selector === 2 && <Display travellers={this.state.travellers} />}
 		
 		{/*Q4. Code to call the component that adds a traveller.*/
-    this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} />}
+    this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} travellers={this.state.travellers} />}
 		{/*Q5. Code to call the component that deletes a traveller based on a given attribute.*/
-    this.state.selector === 4 && <Delete deleteTraveller={this.deleteTraveller} />}
+    this.state.selector === 4 && <Delete deleteTraveller={this.deleteTraveller} travellers={this.state.travellers} />}
 	</div>
       </div>
     );
