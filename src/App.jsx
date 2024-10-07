@@ -74,6 +74,7 @@ class Add extends React.Component {
       bookingTime: new Date(),
       seat:  form.travellerseat.value
     });
+    form.reset();
   }
 
   render() {
@@ -81,7 +82,7 @@ class Add extends React.Component {
       <form name="addTraveller" onSubmit={this.handleSubmit}>
 	    {/*Q4. Placeholder to enter passenger details. Below code is just an example.*/}
         <input type="text" name="travellername" placeholder="Name" />
-        <input type="text" name="travellerphone" placeholder="Phone" />
+        <input type="number" name="travellerphone" placeholder="Phone" />
         <input type="text" name="travellerseat" placeholder="Seat" />
         <button>Add</button>
       </form>
@@ -101,6 +102,7 @@ class Delete extends React.Component {
     const form = document.forms.deleteTraveller;
     const passenger = parseInt(form.travellerid.value);
     this.props.deleteTraveller(passenger);
+    form.reset();
   }
 
   render() {
@@ -139,8 +141,11 @@ class Homepage extends React.Component {
                   margin: '5px',
                   border: '1px solid #ccc',
                   borderRadius: '5px',
-                  display: 'inline-block',
-                  backgroundColor: isOccupied ? 'gray' : 'green', //
+                  display: 'flex',
+                  backgroundColor: isOccupied ? 'gray' : 'green',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
                 };
                 const seatName = `${rowIndex + 1}${String.fromCharCode('A'.charCodeAt(0) + seatIndex)}`;
                 return (
@@ -159,12 +164,115 @@ class Homepage extends React.Component {
 	</div>);
 	}
 }
+
+class Header extends React.Component {
+  constructor() {
+    super();
+    this.state = { hoveredButton: null };
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.handleMouseLeave = this.handleMouseLeave.bind(this);
+  }
+
+  handleMouseEnter(index) {
+    this.setState({ hoveredButton: index });
+  }
+
+  handleMouseLeave() {
+    this.setState({ hoveredButton: null });
+  }
+
+  render() {
+    const headerStyle = {
+      height: '5.5rem',
+      backgroundColor: 'black',
+      width: '100%',
+      position: 'fixed',
+      zIndex: 999,
+      top: 0,
+    };
+
+    const headerContainerStyle = {
+      display: 'flex',
+      justifyContent: 'space-between',
+      maxWidth: '76.5rem',
+      height: '100%',
+      margin: '0 auto',
+      padding: '0 1.5rem',
+    };
+
+    const headerTitleStyle = {
+      display: 'flex',
+      alignItems: 'center',
+      color: 'white',
+      height: '100%',
+    };
+
+    const navDesktopStyle = {
+      display: 'flex',
+      alignItems: 'center',
+    };
+
+    const ulStyle = {
+      display: 'flex',
+      alignItems: 'center',
+    };
+
+    const liStyle = {
+      fontSize: '1.5rem',
+      color: 'white',
+      marginRight: '3rem',
+      fontWeight: 700,
+    };
+
+    const aStyle = {
+      display: 'block',
+      color: 'white',
+      textAlign: 'center',
+      padding: '0.875rem 1rem',
+      textDecoration: 'none',
+    };
+
+    return (
+      <header style={headerStyle}>
+        <div className="header-container" style={headerContainerStyle}>
+          <div className="header-title" style={headerTitleStyle}>
+            <h1>Ticket To Ride</h1>
+          </div>
+          <nav style={navDesktopStyle}>
+            <ul style={ulStyle}>
+              {['Homepage', 'Display Travellers', 'Add Traveller', 'Delete Traveller'].map(
+                (label, index) => (
+                  <li key={index} style={liStyle}>
+                    <a
+                      style={{
+                        ...aStyle,
+                        backgroundColor: this.state.hoveredButton === index ? 'white' : 'transparent',
+                        color: this.state.hoveredButton === index ? 'black' : 'white',
+                      }}
+                      onMouseEnter={() => this.handleMouseEnter(index)}
+                      onMouseLeave={() => this.handleMouseLeave()}
+                      onClick={() => this.props.onSelect(index + 1)}
+                    >
+                      {label}
+                    </a>
+                  </li>
+                )
+              )}
+            </ul>
+          </nav>
+        </div>
+      </header>
+    );
+  }
+}
+
 class TicketToRide extends React.Component {
   constructor() {
     super();
     this.state = { travellers: [], seat : [], selector: 1};
     this.bookTraveller = this.bookTraveller.bind(this);
     this.deleteTraveller = this.deleteTraveller.bind(this);
+    this.setSelector = this.setSelector.bind(this);
   }
 
   setSelector(value)
@@ -236,30 +344,42 @@ class TicketToRide extends React.Component {
       console.log('Traveller deleted', this.state.travellers,this.state.seat);
     });
   }
+
+  handleMouseEnter(index) {
+    this.setState({ hoveredButton: index });
+  }
+
+  handleMouseLeave() {
+    this.setState({ hoveredButton: null });
+  }
+
   render() {
-    return (
-      <div>
-        <h1>Ticket To Ride</h1>
-	  <div>
       {/*Q2. Code for Navigation bar. Use basic buttons to create a nav bar. Use states to manage selection.*/}
-        <button onClick={() => this.setSelector(1)}>Homepage</button>
-        <button onClick={() => this.setSelector(2)}>Display Travellers</button>
-        <button onClick={() => this.setSelector(3)}>Add Traveller</button>
-        <button onClick={() => this.setSelector(4)}>Delete Traveller</button>
-	  </div>
-	<div>
-		{/*Only one of the below four divisions is rendered based on the button clicked by the user.*/}
-		{/*Q2 and Q6. Code to call Instance that draws Homepage. Homepage shows Visual Representation of free seats.*/
-    this.state.selector === 1 && <Homepage travellers={this.state.travellers} seat={this.state.seat} />}
-		{/*Q3. Code to call component that Displays Travellers.*/
-    this.state.selector === 2 && <Display travellers={this.state.travellers} />}
-		
-		{/*Q4. Code to call the component that adds a traveller.*/
-    this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} travellers={this.state.travellers} seat={this.state.seat}/>}
-		{/*Q5. Code to call the component that deletes a traveller based on a given attribute.*/
-    this.state.selector === 4 && <Delete deleteTraveller={this.deleteTraveller} travellers={this.state.travellers} seat={this.state.seat} />}
-	</div>
+    const sectionStyle = {
+      width: '100%',
+      top: '0',
+      flexDirection: 'column',
+      alignItems: 'center',    
+      height: '100%',
+      paddingTop: '5.5rem',   
+    };
+
+    return (
+    <div>
+      <Header onSelect={this.setSelector} />
+      <div style={sectionStyle}>
+        {/*Only one of the below four divisions is rendered based on the button clicked by the user.*/}
+        {/*Q2 and Q6. Code to call Instance that draws Homepage. Homepage shows Visual Representation of free seats.*/
+        this.state.selector === 1 && <Homepage travellers={this.state.travellers} seat={this.state.seat} />}
+        {/*Q3. Code to call component that Displays Travellers.*/
+        this.state.selector === 2 && <Display travellers={this.state.travellers} />}
+        
+        {/*Q4. Code to call the component that adds a traveller.*/
+        this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} travellers={this.state.travellers} seat={this.state.seat}/>}
+        {/*Q5. Code to call the component that deletes a traveller based on a given attribute.*/
+        this.state.selector === 4 && <Delete deleteTraveller={this.deleteTraveller} travellers={this.state.travellers} seat={this.state.seat} />}
       </div>
+  </div>
     );
   }
 }
