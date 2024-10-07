@@ -345,14 +345,6 @@ class TicketToRide extends React.Component {
     });
   }
 
-  handleMouseEnter(index) {
-    this.setState({ hoveredButton: index });
-  }
-
-  handleMouseLeave() {
-    this.setState({ hoveredButton: null });
-  }
-
   render() {
       {/*Q2. Code for Navigation bar. Use basic buttons to create a nav bar. Use states to manage selection.*/}
     const sectionStyle = {
