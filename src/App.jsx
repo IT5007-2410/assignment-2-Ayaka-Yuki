@@ -1,5 +1,7 @@
 /*Q1. JS Variable needs to be created here. Below variable is just an example. Try to add more attributes.*/
-const initialTravellers = [
+const storedTravellers = JSON.parse(localStorage.getItem('travellers'));
+const storedSeatMap = JSON.parse(localStorage.getItem('seatMap'));
+const initialTravellers = storedTravellers || [
   {
     id: 1, name: 'Jack', phone: 88885555,
     bookingTime: new Date(), seat: "1A",
@@ -12,7 +14,7 @@ const initialTravellers = [
   },
 ];
 
-const initialSeatMap = [[true, true, false, false],
+const initialSeatMap = storedSeatMap || [[true, true, false, false],
 [false, false, false, false],
 [false, false, false, false],
 [false, false, false, false],
@@ -444,9 +446,14 @@ class TicketToRide extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     // If selector changes and we are going to Display (selector = 2), reset isSelected
     if (prevState.selector !== this.state.selector && this.state.selector === 2) {
-      this.resetIsSelected();  // Reset selection when entering Display section
+      this.resetIsSelected(); 
     }
+    // Save state to localStorage
+    if (prevState.travellers !== this.state.travellers || prevState.seat !== this.state.seat) {
+      localStorage.setItem('travellers', JSON.stringify(this.state.travellers || []));
+      localStorage.setItem('seatMap', JSON.stringify(this.state.seat || {}));
   }
+    }
 
   loadData() {
     setTimeout(() => {
