@@ -35,7 +35,7 @@ function TravellerRow(props) {
       <td style={cellStyle}>{props.traveller.bookingTime.toString()}</td>
       <td style={cellStyle}>{props.traveller.seat}</td>
       <td style={cellStyle}>
-        <input type="checkbox" checked={props.traveller.isSelected} onChange={() => props.handleCheckboxChange(props.traveller.id)} />
+        <input type="checkbox" checked={props.traveller.isSelected} onChange={() => props.handleCheckboxChange(props.traveller.id)} id={props.traveller.id} />
       </td>
     </tr>
   );
@@ -55,6 +55,23 @@ function Display(props) {
     padding: '1rem',
     textAlign: 'center',
     marginBottom: '4rem'
+  };
+
+  const deleteStyle = {
+    display: 'flex',
+    justifyContent: 'center',
+    marginTop: '3rem'
+}
+
+  const buttonStyle = {
+    padding: '1rem 2rem',
+    fontSize: '1.5rem',
+    backgroundColor: 'grey',
+    color: 'black', 
+    border: 'none',
+    borderRadius: '0.5rem',
+    cursor: 'pointer',
+    marginRight: '2rem'
   };
   
   /*Q3. Write code to render rows of table, reach corresponding to one traveller. Make use of the TravellerRow function that draws one row.*/
@@ -78,7 +95,10 @@ function Display(props) {
       }
     </tbody>
     </table>
-    <button onClick={props.onDeleteSelected}>Delete Selected</button>
+    <div style={deleteStyle}>
+      <button id="delete_button" style={buttonStyle} onClick={props.onDeleteSelected}>Delete Selected</button>
+    </div>
+    
   </div>
   );
 }
@@ -106,13 +126,64 @@ class Add extends React.Component {
   }
 
   render() {
+    const formContainerStyle = {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      height: '50%',
+      width: '100%',
+      maxWidth: '80%',
+      paddingRight: '20%',
+    };
+
+    const formGroupStyle = {
+      width: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: '1rem',
+      gap: '1rem',
+    };
+    
+    const labelStyle = {
+      width: '30%',
+      margin: '0',
+      fontSize: '1.5rem',
+      fontWeight: 'bold',
+      minWidth: '100px',
+      textAlign: 'right',
+      flex: 1,
+    };
+    
+    const inputStyle = {
+      width: '70%',
+      flex: 2,
+      padding: '1rem',
+      border: '0.05rem solid black',
+      borderRadius: '0.05rem',
+      fontSize: '1.5rem',
+      minWidth: '20rem',
+    };
+    
     return (
-      <form name="addTraveller" onSubmit={this.handleSubmit}>
+      <form name="addTraveller" onSubmit={this.handleSubmit} style={formContainerStyle}>
 	    {/*Q4. Placeholder to enter passenger details. Below code is just an example.*/}
-        <input type="text" name="travellername" placeholder="Name" />
-        <input type="number" name="travellerphone" placeholder="Phone" />
-        <input type="text" name="travellerseat" placeholder="Seat" />
-        <button>Add</button>
+        <div className="form-group" style={formGroupStyle}>
+          <label htmlFor="travellername" style={labelStyle}>Travller Name</label>
+          <input id="travellername" type="text" name="travellername" placeholder="Name"  style={inputStyle} required />
+        </div>
+        <div className="form-group" style={formGroupStyle}> 
+          <label htmlFor="travellerphone" style={labelStyle}>Travller Phone</label>
+          <input id="travellerphone" type="number" name="travellerphone" placeholder="Phone" style={inputStyle} required />
+        </div>
+        <div className="form-group" style={formGroupStyle}>
+          <label htmlFor="travellerseat" style={labelStyle}>Travller Seat</label>
+          <input id="travellerseat" type="text" name="travellerseat" placeholder="Seat" style={inputStyle} required />
+        </div>
+        <div className="form-group" style={formGroupStyle}>
+          <label htmlFor="submit" style={labelStyle}></label>
+          <input id="submit" type="submit" value="Add" style={inputStyle}/>
+        </div>
       </form>
     );
   }
@@ -134,11 +205,55 @@ class Delete extends React.Component {
   }
 
   render() {
+      const formContainerStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        height: '50%',
+        width: '100%',
+        maxWidth: '80%',
+        paddingRight: '20%',
+      };
+  
+      const formGroupStyle = {
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: '1rem',
+        gap: '1rem',
+      };
+      
+      const labelStyle = {
+        width: '30%',
+        margin: '0',
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        minWidth: '100px',
+        textAlign: 'right',
+        flex: 1,
+      };
+      
+      const inputStyle = {
+        width: '70%',
+        flex: 2,
+        padding: '1rem',
+        border: '0.05rem solid black',
+        borderRadius: '0.05rem',
+        fontSize: '1.5rem',
+        minWidth: '20rem',
+      };  
     return (
-      <form name="deleteTraveller" onSubmit={this.handleSubmit}>
+      <form name="deleteTraveller" onSubmit={this.handleSubmit} style={formContainerStyle}>
 	    {/*Q5. Placeholder form to enter information on which passenger's ticket needs to be deleted. Below code is just an example.*/}
-        <input type="number" name="travellerid" placeholder="ID" />
-        <button>Delete</button>
+      <div className="form-group" style={formGroupStyle}>
+        <label htmlFor="delete_entry" style={labelStyle}>Traveller ID</label>
+        <input id="delete_entry" type="number" step="1" min = "1" name="travellerid" required style={inputStyle}/>
+      </div>
+      <div className="form-group" style={formGroupStyle}>
+        <label htmlFor="submit" style={labelStyle}></label>
+        <input id= "submit" type="submit" value="Delete" style={inputStyle}/>
+      </div>
       </form>
     );
   }
