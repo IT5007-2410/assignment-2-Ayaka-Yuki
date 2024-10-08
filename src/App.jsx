@@ -2,11 +2,13 @@
 const initialTravellers = [
   {
     id: 1, name: 'Jack', phone: 88885555,
-    bookingTime: new Date(), seat: "1A"
+    bookingTime: new Date(), seat: "1A",
+    isSelected: false
   },
   {
     id: 2, name: 'Rose', phone: 88884444,
-    bookingTime: new Date(), seat: "1B"
+    bookingTime: new Date(), seat: "1B",
+    isSelected: false
   },
 ];
 
@@ -19,40 +21,65 @@ const initialSeatMap = [[true, true, false, false],
 
 function TravellerRow(props) {
   {/*Q3. Placeholder to initialize local variable based on traveller prop.*/}
+  const cellStyle = {
+    border: '0.1rem solid black',
+    padding: '1rem',
+    textAlign: 'center',
+    marginBottom: '4rem'
+  };
   return (
     <tr>
-	  {/*Q3. Placeholder for rendering one row of a table with required traveller attribute values.*/}
-      <td>{props.traveller.id}</td>
-      <td>{props.traveller.name}</td>
-      <td>{props.traveller.phone}</td>
-      <td>{props.traveller.bookingTime.toString()}</td>
-      <td>{props.traveller.seat}</td>
+      <td style={cellStyle}>{props.traveller.id}</td>
+      <td style={cellStyle}>{props.traveller.name}</td>
+      <td style={cellStyle}>{props.traveller.phone}</td>
+      <td style={cellStyle}>{props.traveller.bookingTime.toString()}</td>
+      <td style={cellStyle}>{props.traveller.seat}</td>
+      <td style={cellStyle}>
+        <input type="checkbox" checked={props.traveller.isSelected} onChange={() => props.handleCheckboxChange(props.traveller.id)} />
+      </td>
     </tr>
   );
 }
 
 function Display(props) {
-  
-	/*Q3. Write code to render rows of table, reach corresponding to one traveller. Make use of the TravellerRow function that draws one row.*/
+  const tableStyle = {
+    marginTop: '1rem',
+    width: '100%',
+    borderCollapse: 'collapse',
+    flexGrow: 1,
+    border: '0.2rem solid black'
+  };
 
+  const cellStyle = {
+    border: '0.1rem solid black',
+    padding: '1rem',
+    textAlign: 'center',
+    marginBottom: '4rem'
+  };
+  
+  /*Q3. Write code to render rows of table, reach corresponding to one traveller. Make use of the TravellerRow function that draws one row.*/
   return (
-    <table className="bordered-table">
-      <thead>
-        <tr>
-	        {/*Q3. Below table is just an example. Add more columns based on the traveller attributes you choose.*/}
-          <th>ID</th>
-          <th>Name</th>
-          <th>Phone</th>
-          <th>Booking Time</th>
-          <th>Seat</th>
-        </tr>
-      </thead>
-      <tbody>
-        {/*Q3. write code to call the JS variable defined at the top of this function to render table rows.*/
-        props.travellers.map(traveller => (<TravellerRow key={traveller.id} traveller={traveller} />))
-        }
-      </tbody>
+  <div>
+    <table className="bordered-table" style={tableStyle}>
+    <thead>
+      <tr>
+        {/*Q3. Below table is just an example. Add more columns based on the traveller attributes you choose.*/}
+      <th style={cellStyle}>ID</th>
+      <th style={cellStyle}>Name</th>
+      <th style={cellStyle}>Phone</th>
+      <th style={cellStyle}>Booking Time</th>
+      <th style={cellStyle}>Seat</th>
+      <th style={cellStyle}>Selected</th>
+      </tr>
+    </thead>
+    <tbody>
+      {/*Q3. write code to call the JS variable defined at the top of this function to render table rows.*/
+      props.travellers.map(traveller => (<TravellerRow key={traveller.id} traveller={traveller} handleCheckboxChange={props.handleCheckboxChange}/>))
+      }
+    </tbody>
     </table>
+    <button onClick={props.onDeleteSelected}>Delete Selected</button>
+  </div>
   );
 }
 
@@ -72,7 +99,8 @@ class Add extends React.Component {
       name: form.travellername.value, 
       phone: form.travellerphone.value,
       bookingTime: new Date(),
-      seat:  form.travellerseat.value
+      seat:  form.travellerseat.value,
+      isSelected: false
     });
     form.reset();
   }
@@ -125,7 +153,7 @@ class Homepage extends React.Component {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      margin: '20px',
+      margin: '1rem',
     };
 	return (
 	<div>
@@ -136,11 +164,11 @@ class Homepage extends React.Component {
             <div key={rowIndex} className="seat-row" style={{ display: 'flex' }}>
               {row.map((isOccupied, seatIndex) => {
                 const seatStyle = {
-                  width: '30px',
-                  height: '30px',
-                  margin: '5px',
-                  border: '1px solid #ccc',
-                  borderRadius: '5px',
+                  width: '2rem',
+                  height: '2rem',
+                  margin: '0.5rem',
+                  border: '0.1rem solid #ccc',
+                  borderRadius: '0.5re,',
                   display: 'flex',
                   backgroundColor: isOccupied ? 'gray' : 'green',
                   justifyContent: 'center',
@@ -273,6 +301,10 @@ class TicketToRide extends React.Component {
     this.bookTraveller = this.bookTraveller.bind(this);
     this.deleteTraveller = this.deleteTraveller.bind(this);
     this.setSelector = this.setSelector.bind(this);
+    this.selectTraveller = this.selectTraveller.bind(this);
+    this.deleteSelected = this.deleteSelected.bind(this);
+    this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.resetIsSelected = this.resetIsSelected.bind(this);
   }
 
   setSelector(value)
@@ -282,6 +314,13 @@ class TicketToRide extends React.Component {
   }
   componentDidMount() {
     this.loadData();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // If selector changes and we are going to Display (selector = 2), reset isSelected
+    if (prevState.selector !== this.state.selector && this.state.selector === 2) {
+      this.resetIsSelected();  // Reset selection when entering Display section
+    }
   }
 
   loadData() {
@@ -301,7 +340,9 @@ class TicketToRide extends React.Component {
       }
       const seatRowIndex = parseInt(passenger.seat[0]) - 1;
       const seatColumnIndex = passenger.seat.charCodeAt(1) - 'A'.charCodeAt(0);
-      if (seatRowIndex >= this.state.seat.length || seatRowIndex < 0  || seatColumnIndex >= this.state.seat[0].length || seatColumnIndex < 0) {
+      if (isNaN(seatRowIndex) || isNaN(seatColumnIndex) || 
+      seatRowIndex >= this.state.seat.length || seatRowIndex < 0 
+      || seatColumnIndex >= this.state.seat[0].length || seatColumnIndex < 0) {
         alert('Invalid seat.');
         return;
       } else if (this.state.seat[seatRowIndex][seatColumnIndex] === true) {
@@ -345,6 +386,37 @@ class TicketToRide extends React.Component {
     });
   }
 
+  selectTraveller = (id, isSelected) => {
+    this.setState((prevState) => ({
+      travellers: prevState.travellers.map(traveller =>
+      traveller.id === id ? { ...traveller, isSelected: isSelected } : traveller
+      )
+    }));
+  }
+
+  deleteSelected = () => {
+    const selectedTravellers = this.state.travellers.filter(traveller => traveller.isSelected);
+    selectedTravellers.forEach(traveller => this.deleteTraveller(traveller.id));
+  };
+
+  handleCheckboxChange(travellerId) {
+    this.setState((prevState) => ({
+      travellers: prevState.travellers.map(traveller =>
+        traveller.id === travellerId ? { ...traveller, isSelected: !traveller.isSelected } : traveller
+      ),
+    }));
+  }
+
+  resetIsSelected() {
+    // Set isSelected to false for all travellers
+    this.setState(prevState => ({
+      travellers: prevState.travellers.map(traveller => ({
+        ...traveller,
+        isSelected: false
+      }))
+    }));
+  }
+
   render() {
       {/*Q2. Code for Navigation bar. Use basic buttons to create a nav bar. Use states to manage selection.*/}
     const sectionStyle = {
@@ -364,7 +436,7 @@ class TicketToRide extends React.Component {
         {/*Q2 and Q6. Code to call Instance that draws Homepage. Homepage shows Visual Representation of free seats.*/
         this.state.selector === 1 && <Homepage travellers={this.state.travellers} seat={this.state.seat} />}
         {/*Q3. Code to call component that Displays Travellers.*/
-        this.state.selector === 2 && <Display travellers={this.state.travellers} />}
+        this.state.selector === 2 && <Display travellers={this.state.travellers} onDeleteSelected={this.deleteSelected} onSelectTraveller={this.selectTraveller} handleCheckboxChange={this.handleCheckboxChange}/>}
         
         {/*Q4. Code to call the component that adds a traveller.*/
         this.state.selector === 3 && <Add bookTraveller={this.bookTraveller} travellers={this.state.travellers} seat={this.state.seat}/>}
