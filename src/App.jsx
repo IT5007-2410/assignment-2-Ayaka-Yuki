@@ -478,7 +478,7 @@ class TicketToRide extends React.Component {
         alert('Invalid seat.');
         return;
       } else if (this.state.seat[seatRowIndex][seatColumnIndex] === true) {
-        alert('Curent seat is already booked.');
+        alert('Current seat is already booked.');
         return;
       } else {
       this.setState((prevState) => {
