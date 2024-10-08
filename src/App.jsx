@@ -272,38 +272,48 @@ class Homepage extends React.Component {
     };
 	return (
 	<div>
-		{/*Q2. Placeholder for Homepage code that shows free seats visually.*/}
-        <h1>Seat Reservation</h1>
-        <div className="seat-container" style={containerStyle}>
-          {this.props.seat.map((row, rowIndex) => (
-            <div key={rowIndex} className="seat-row" style={{ display: 'flex' }}>
-              {row.map((isOccupied, seatIndex) => {
-                const seatStyle = {
-                  width: '2rem',
-                  height: '2rem',
-                  margin: '0.5rem',
-                  border: '0.1rem solid #ccc',
-                  borderRadius: '0.5re,',
-                  display: 'flex',
-                  backgroundColor: isOccupied ? 'gray' : 'green',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  textAlign: 'center',
-                };
-                const seatName = `${rowIndex + 1}${String.fromCharCode('A'.charCodeAt(0) + seatIndex)}`;
-                return (
-                <div
-                  key={seatIndex}
-                  className="seat"
-                  style={seatStyle}
-                >
-                  {seatName}
-                </div>
-                );
-        })}
-            </div>
-          ))}
+    {/*Q2. Placeholder for Homepage code that shows free seats visually.*/}
+      <h1 style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>Seat Reservation</h1>
+      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginRight: '1rem' }}>
+          <div style={{ width: '2rem', height: '2rem', backgroundColor: 'green', marginRight: '0.5rem', borderRadius:'0.5rem' }}></div>
+          <span>Available</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ width: '2rem', height: '2rem', backgroundColor: 'gray', marginRight: '0.5rem', borderRadius:'0.5rem'}}></div>
+          <span>Occupied</span>
+        </div>
+      </div>
+      <div className="seat-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '2rem' }}>
+        {this.props.seat.map((row, rowIndex) => (
+          <div key={rowIndex} className="seat-row" style={{ display: 'flex' }}>
+            {row.map((isOccupied, seatIndex) => {
+        const seatStyle = {
+          width: '3em',
+          height: '3rem',
+          margin: '1rem',
+          border: '0.2rem solid #ccc',
+          borderRadius: '1rem',
+          display: 'flex',
+          backgroundColor: isOccupied ? 'gray' : 'green',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+        };
+        const seatName = `${rowIndex + 1}${String.fromCharCode('A'.charCodeAt(0) + seatIndex)}`;
+        return (
+          <div
+            key={seatIndex}
+            className="seat"
+            style={seatStyle}
+          >
+            {seatName}
+          </div>
+        );
+            })}
+          </div>
+        ))}
+      </div>
 	</div>);
 	}
 }
